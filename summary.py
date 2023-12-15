@@ -1,3 +1,4 @@
+import os
 import getpass
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import TextLoader
@@ -6,15 +7,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.prompts import PromptTemplate
 
 
-def summarize_text(filename):
-    # 輸入 OpneAI API Key
-    OPENAI_API_KEY = getpass.getpass(prompt='open api key: ')
-    
+def summarize_text(input_textfile, OPENAI_API_KEY):    
     # intialize ChatOpenAI object
     chat = ChatOpenAI(temperature=0.0, model='gpt-3.5-turbo-1106', openai_api_key=OPENAI_API_KEY)
 
     # Load transcribed text
-    loader = TextLoader(filename)
+    loader = TextLoader(input_textfile)
     transcription = loader.load()
 
     # Split transcribed text into chunks
@@ -65,11 +63,16 @@ def summarize_text(filename):
     return result
 
 if __name__ == "__main__":
-    # 讓使用者輸入文字檔檔名
-    filename = input('輸入文字檔路徑:')
+    # 輸入文字檔檔名與 API KEY
+    input_textfile = input('輸入文字檔路徑:')
+    OPENAI_API_KEY = getpass.getpass(prompt='open api key:')
+
+    # 取出音檔名稱作為後續output名稱
+    file_name_with_extension = os.path.basename(input_textfile)
+    filename, _ = os.path.splitext(file_name_with_extension)
 
     # 生成摘要
-    summary_result = summarize_text(filename)
+    summary_result = summarize_text(input_textfile, OPENAI_API_KEY)
 
     # 印出摘要結果
     print(summary_result['output_text'])
